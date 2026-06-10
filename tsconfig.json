@@ -1,0 +1,23 @@
+# ---- Auth (single-user) ----
+# The password you'll type to sign in. Pick something strong.
+APP_PASSWORD=change-me-to-a-long-random-passphrase
+# Secret used to sign the session cookie. Generate: openssl rand -hex 32
+SESSION_SECRET=replace-with-64-hex-chars
+
+# ---- Anthropic (generates the news + deep-dive each morning) ----
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
+# Pick a current model string from your Anthropic console.
+ANTHROPIC_MODEL=claude-sonnet-4-5
+
+# ---- Market data (live quotes; no brokerage login involved) ----
+# Free key from https://finnhub.io
+FINNHUB_API_KEY=your-finnhub-key
+
+# ---- Storage (Upstash Redis / Vercel KV) ----
+# From Vercel > Storage > KV (Upstash), or upstash.com directly
+KV_REST_API_URL=https://xxxx.upstash.io
+KV_REST_API_TOKEN=xxxxxxxx
+
+# ---- Cron protection ----
+# Generate: openssl rand -hex 16  (set the SAME value in Vercel cron settings)
+CRON_SECRET=replace-with-random-hex
