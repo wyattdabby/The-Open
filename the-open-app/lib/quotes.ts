@@ -1,6 +1,5 @@
 import type { Holding, QuoteRow } from "./types";
 
-// Finnhub free tier: https://finnhub.io/docs/api/quote
 async function fetchQuote(symbol: string): Promise<{ c: number; pc: number } | null> {
   const key = process.env.FINNHUB_API_KEY;
   if (!key) return null;
@@ -18,16 +17,28 @@ async function fetchQuote(symbol: string): Promise<{ c: number; pc: number } | n
   }
 }
 
+async function fetchAll(symbols: string[]): Promise<Record<string, { c: number; pc: number }>> {
+  const out: Record<string, { c: number; pc: number }> = {};
+  const BATCH = 8;
+  for (let i = 0; i < symbols.length; i += BATCH) {
+    const slice = symbols.slice(i, i + BATCH);
+    const results = await Promise.all(slice.map((s) => fetchQuote(s)));
+    slice.forEach((s, idx) => { const q = results[idx]; if (q) out[s] = q; });
+    if (i + BATCH < symbols.length) await new Promise((res) => setTimeout(res, 300));
+  }
+  return out;
+}
+
 export async function buildPortfolio(holdings: Holding[]) {
+  const quotes = await fetchAll(holdings.map((h) => h.symbol));
   const rows: QuoteRow[] = [];
   for (const h of holdings) {
-    const q = await fetchQuote(h.symbol);
+    const q = quotes[h.symbol];
     if (!q) continue;
     const value = h.shares * q.c;
     const dayUsd = h.shares * (q.c - q.pc);
     const dayPct = q.pc ? (q.c / q.pc - 1) * 100 : 0;
     rows.push({ symbol: h.symbol, price: q.c, prevClose: q.pc, value, dayPct, dayUsd });
-    await new Promise((res) => setTimeout(res, 120)); // be gentle on free-tier rate limits
   }
   const total = rows.reduce((s, r) => s + r.value, 0);
   const dayUsd = rows.reduce((s, r) => s + r.dayUsd, 0);
