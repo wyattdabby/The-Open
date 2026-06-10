@@ -1,10 +1,21 @@
-import { getLatestEdition } from "@/lib/kv";
-import Dashboard from "./Dashboard";
-
-export const dynamic = "force-dynamic";
-
-export default async function Home() {
-  let edition = null;
-  try { edition = await getLatestEdition(); } catch {}
-  return <Dashboard edition={edition} />;
+{
+  "name": "the-open-brief",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.34.0",
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.0",
+    "@types/react": "18.3.3",
+    "typescript": "5.5.3"
+  }
 }
